@@ -1,6 +1,5 @@
 package user;
 
-import io.qameta.allure.Description;
 import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
 import org.junit.Assert;
@@ -21,7 +20,7 @@ public class UserSteps {
         Assert.assertTrue(createUserFromApi.contains("true"));
     }
 
-    @Step("Checking the status code and response of the POST request when creating a user")
+    @Step("Checking the status code and response of the POST request when creating a user duplicate")
     public void postCreateNegativeUser(User exUser) {
         ValidatableResponse response = createUserApi.postCreateUser(exUser).then();
         response.assertThat().statusCode(403);
@@ -54,10 +53,11 @@ public class UserSteps {
     }
 
     @Step("Checking the status code and the response to the DELETE request")
-    public void deletePositiveUser(User exUser) {
+    public void deleteAuthUser(User exUser) {
         ValidatableResponse response = authorizationUserApi.postAuthUser(exUser).then();
-        exUser =  response.extract().body().as(User.class);
+        exUser = response.extract().body().as(User.class);
         String token = exUser.getAccessToken();
+
         ValidatableResponse responseDelete = deleteUserApi.deleteUser(token).then();
         responseDelete.assertThat().statusCode(202);
         String deleteUserFromApi = responseDelete.extract().body().asString();
@@ -65,7 +65,7 @@ public class UserSteps {
     }
 
     @Step("Checking the status code and response of the POST request when authorization a user")
-    public void postAuthPositiveUser(User exUser) {
+    public void postAuthUser(User exUser) {
         ValidatableResponse response = authorizationUserApi.postAuthUser(exUser).then();
         response.assertThat().statusCode(200);
         String authUserFromApi = response.extract().body().asString();
@@ -81,7 +81,7 @@ public class UserSteps {
     }
 
     @Step("Checking the status code and the response to the POST request when authorization a user without a password")
-    public void  postAuthWithoutPasswordUser(User exUser) {
+    public void postAuthWithoutPasswordUser(User exUser) {
         ValidatableResponse response = authorizationUserApi.postAuthUser(exUser).then();
         response.assertThat().statusCode(401);
         User authUserFromApi = response.extract().body().as(User.class);
@@ -93,14 +93,14 @@ public class UserSteps {
         //получаем токен
         ValidatableResponse response = authorizationUserApi.postAuthUser(exUser).then();
         response.assertThat().statusCode(200);
-        exUser =  response.extract().body().as(User.class);
+        exUser = response.extract().body().as(User.class);
         String accessToken = exUser.getAccessToken();
         String refreshToken = exUser.getRefreshToken();
         //изменяем данные
         User newUserFromPath = new User("churikov12345678@yandex.ru", "Agooddaytotest", "Михаил");
-        ValidatableResponse responsePatch = patchUserApi.patchUser(newUserFromPath, accessToken).then();
+        ValidatableResponse responsePatch = patchUserApi.patchAuthUser(newUserFromPath, accessToken).then();
         responsePatch.assertThat().statusCode(200);
-        String patchAuthApi =  responsePatch.extract().body().asString();
+        String patchAuthApi = responsePatch.extract().body().asString();
         Assert.assertTrue(patchAuthApi.contains("churikov12345678@yandex.ru") && patchAuthApi.contains("Михаил"));
         //разлогиниваемся из системы
         ValidatableResponse logout = loguotUserApi.postUser(accessToken, refreshToken).then();
@@ -108,7 +108,7 @@ public class UserSteps {
         //входим в систему и проверяем, что изменились все данные, включая пароль
         ValidatableResponse responseLastAuth = authorizationUserApi.postAuthUser(newUserFromPath).then();
         responseLastAuth.assertThat().statusCode(200);
-        String authLast =  responseLastAuth.extract().body().asString();
+        String authLast = responseLastAuth.extract().body().asString();
         Assert.assertTrue(authLast.contains("churikov12345678@yandex.ru") && authLast.contains("Михаил"));
     }
 
@@ -116,13 +116,13 @@ public class UserSteps {
     public void patchAuthUserWithoutLogin(User exUser) {
         ValidatableResponse response = authorizationUserApi.postAuthUser(exUser).then();
         response.assertThat().statusCode(200);
-        exUser =  response.extract().body().as(User.class);
+        exUser = response.extract().body().as(User.class);
         String accessToken = exUser.getAccessToken();
 
         User newUserFromPath = new User("churikov2020@yandex.ru", "Agooddaytotest", "Чуриков");
-        ValidatableResponse responsePatch = patchUserApi.patchUser(newUserFromPath, accessToken).then();
+        ValidatableResponse responsePatch = patchUserApi.patchAuthUser(newUserFromPath, accessToken).then();
         responsePatch.assertThat().statusCode(403);
-        User patchAuthApi =  responsePatch.extract().body().as(User.class);
+        User patchAuthApi = responsePatch.extract().body().as(User.class);
         Assert.assertEquals("User with such email already exists", patchAuthApi.getMessage());
     }
 
@@ -130,42 +130,8 @@ public class UserSteps {
     public void patchNotAuthUser(User exUser) {
         ValidatableResponse responsePatch = patchUserApi.patchNotAuthUser(exUser).then();
         responsePatch.assertThat().statusCode(401);
-        User patchAuthApi =  responsePatch.extract().body().as(User.class);
+        User patchAuthApi = responsePatch.extract().body().as(User.class);
         Assert.assertEquals("You should be authorised", patchAuthApi.getMessage());
     }
-
-
-
-
-
-
-
-
-
-
-
-  /*  @Step("Checking the status code and the response to the PATCH request when authorization with login a user")
-    public void  patchAuthWithPasswordUser(User exUser) {
-        ValidatableResponse response = authorizationUserApi.postAuthUser(exUser).then();
-        exUser =  response.extract().body().as(User.class);
-        String accessToken = exUser.getAccessToken();
-        String refreshToken = exUser.getRefreshToken();
-
-        User newUserFromPath = new User("churikov2024@yandex.ru", "Agooddaytotestint", "Misha");
-        ValidatableResponse responsePatch = patchUserApi.patchUser(newUserFromPath, accessToken).then();
-        responsePatch.assertThat().statusCode(200);
-
-        ValidatableResponse logout = loguotUserApi.postUser(accessToken, refreshToken).then();
-        logout.assertThat().statusCode(200);
-
-        ValidatableResponse responseLastAuth = authorizationUserApi.postAuthUser(exUser).then();
-        responseLastAuth.assertThat().statusCode(200);
-        String authLast =  response.extract().body().asString();
-        Assert.assertFalse(authLast.contains("Agooddaytotest"));
-
-    }*/
-
-
-
 
 }

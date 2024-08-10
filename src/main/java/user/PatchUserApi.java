@@ -6,7 +6,7 @@ import io.restassured.response.Response;
 public class PatchUserApi extends BaseHttpClient {
     private final String apiPathPatch = "/api/auth/user";
 
-    public Response patchUser(User user, String token) {
+    public Response patchAuthUser(User user, String token) {
         return doAuthPatchRequest(apiPathPatch, user, token);
     }
 

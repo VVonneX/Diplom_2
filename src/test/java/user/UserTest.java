@@ -2,9 +2,8 @@ package user;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
-import org.junit.*;
+import org.junit.Test;
 
-@FixMethodOrder
 public class UserTest {
 
     private UserSteps steps = new UserSteps();
@@ -52,9 +51,9 @@ public class UserTest {
     @Test
     @DisplayName("Authorization a user is a positive test")
     @Description("Checking the status code and response of the POST request when authorization a user")
-    public void authUserPositiveTest() {
+    public void authUserTest() {
         User user = new User("churikov999@yandex.ru", "Agooddaytotesting", "Misha");
-        steps.postAuthPositiveUser(user);
+        steps.postAuthUser(user);
     }
 
     @Test
@@ -77,7 +76,7 @@ public class UserTest {
     @Test
     @DisplayName("Refactor a user is a positive test")
     @Description("Checking the status code and response of the PATCH request when refactor a user")
-    public void patchUserPositiveTest() {
+    public void patchAuthUserTest() {
         User user = new User("churikov1999@yandex.ru", "Agooddaytotesting", "Misha");
         steps.patchAuthUser(user);
     }
@@ -85,7 +84,7 @@ public class UserTest {
     @Test
     @DisplayName("Refactor a user with login")
     @Description("Checking the status code and response of the PATCH request when refactor a duplicate email in user")
-    public void patchUserWithoutLoginTest() {
+    public void patchAuthUserWithoutLoginTest() {
         User user = new User("churikov999@yandex.ru", "Agooddaytotesting", "Михаил");
         steps.patchAuthUserWithoutLogin(user);
     }
@@ -101,8 +100,8 @@ public class UserTest {
     @Test
     @DisplayName("Courier removal is a positive test")
     @Description("Checking the status code and the response to the DELETE request")
-    public void deleteUserPositiveTest() {
-       User user = new User("churikov12345678@yandex.ru", "Agooddaytotest", "Михаил");
-       steps.deletePositiveUser(user);
+    public void ultimateDeleteAuthUserTest() {
+        User user = new User("churikov12345678@yandex.ru", "Agooddaytotest", "Михаил");
+        steps.deleteAuthUser(user);
     }
 }

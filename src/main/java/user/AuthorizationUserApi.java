@@ -7,6 +7,6 @@ public class AuthorizationUserApi extends BaseHttpClient {
     private final String apiPathCreate = "/api/auth/login";
 
     public Response postAuthUser(User user) {
-        return doPostRequest(apiPathCreate, user);
+        return doNotAuthPostRequest(apiPathCreate, user);
     }
 }

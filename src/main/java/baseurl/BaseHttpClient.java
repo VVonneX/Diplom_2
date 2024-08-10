@@ -6,7 +6,6 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import user.User;
 
 import static io.restassured.RestAssured.given;
 
@@ -25,7 +24,7 @@ public class BaseHttpClient {
     private RequestSpecification baseRequestSpecAuth(String token) {
         return new RequestSpecBuilder()
                 .setBaseUri(URL.HOST)
-                .addHeader("Authorization",  token)
+                .addHeader("Authorization", token)
                 .setRelaxedHTTPSValidation()
                 .addFilter(new RequestLoggingFilter())
                 .addFilter(new ResponseLoggingFilter())
@@ -33,13 +32,47 @@ public class BaseHttpClient {
                 .build();
     }
 
-    protected Response doPostRequest(String path, Object body) {
+    protected Response doGetAuthRequest(String path, String token) {
+        return given()
+                .spec(baseRequestSpecAuth(token))
+                .get(path)
+                .thenReturn();
+    }
+
+    protected Response doGetNotAuthRequest(String path) {
+        return given()
+                .spec(baseRequestSpecNoAuth())
+                .get(path)
+                .thenReturn();
+    }
+
+
+    protected Response doNotAuthPostRequest(String path, Object body) {
         return given()
                 .spec(baseRequestSpecNoAuth())
                 .body(body)
                 .post(path)
                 .thenReturn();
     }
+
+    protected Response doAuthPostRequest(String path, String token1, String token2) {
+        return given()
+                .spec(baseRequestSpecAuth(token1))
+                .header("Content-type", "application/json")
+                .body("{\"token\" : " + "\"" + token2 + "\"}")
+                .post(path)
+                .thenReturn();
+    }
+
+    protected Response doAuthPostRequest(String path, Object body, String token) {
+        return given()
+                .spec(baseRequestSpecAuth(token))
+                .header("Content-type", "application/json")
+                .body(body)
+                .post(path)
+                .thenReturn();
+    }
+
 
     protected Response doAuthPatchRequest(String path, Object body, String token) {
         return given()
@@ -59,21 +92,11 @@ public class BaseHttpClient {
                 .thenReturn();
     }
 
-    protected Response doAuthPostRequest(String path, String token1, String token2) {
-        return given()
-                .spec(baseRequestSpecAuth(token1))
-                .header("Content-type", "application/json")
-                .body("{\"token\" : " + "\"" + token2 + "\"}")
-                .post(path)
-                .thenReturn();
-    }
-
     protected Response doDeleteRequest(String path, String token) {
         return given()
                 .spec(baseRequestSpecAuth(token))
                 .delete(path)
                 .thenReturn();
     }
-
 
 }

@@ -17,11 +17,6 @@ public class User {
     private String refreshToken;
     private String message;
 
-    public User(String email, String name) {
-        this.email = email;
-        this.name = name;
-    }
-
     public User(String email, String password, String name) {
         this.email = email;
         this.password = password;

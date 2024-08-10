@@ -7,7 +7,7 @@ public class CreateUserApi extends BaseHttpClient {
     private final String apiPathCreate = "/api/auth/register";
 
     public Response postCreateUser(User user) {
-        return doPostRequest(apiPathCreate, user);
+        return doNotAuthPostRequest(apiPathCreate, user);
     }
 
 }
