@@ -10,7 +10,7 @@ public class UserSteps {
     private DeleteUserApi deleteUserApi = new DeleteUserApi();
     private AuthorizationUserApi authorizationUserApi = new AuthorizationUserApi();
     private PatchUserApi patchUserApi = new PatchUserApi();
-    private LoguotUserApi loguotUserApi = new LoguotUserApi();
+    private LogoutUserApi logoutUserApi = new LogoutUserApi();
 
     @Step("Checking the status code and response of the POST request when creating a user")
     public void postCreatePositiveUser(User exUser) {
@@ -103,7 +103,7 @@ public class UserSteps {
         String patchAuthApi = responsePatch.extract().body().asString();
         Assert.assertTrue(patchAuthApi.contains("churikov12345678@yandex.ru") && patchAuthApi.contains("Михаил"));
         //разлогиниваемся из системы
-        ValidatableResponse logout = loguotUserApi.postUser(accessToken, refreshToken).then();
+        ValidatableResponse logout = logoutUserApi.postUser(accessToken, refreshToken).then();
         logout.assertThat().statusCode(200);
         //входим в систему и проверяем, что изменились все данные, включая пароль
         ValidatableResponse responseLastAuth = authorizationUserApi.postAuthUser(newUserFromPath).then();

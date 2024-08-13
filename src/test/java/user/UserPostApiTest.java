@@ -4,7 +4,7 @@ import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Test;
 
-public class UserTest {
+public class UserPostApiTest {
 
     private UserSteps steps = new UserSteps();
 
@@ -14,13 +14,14 @@ public class UserTest {
     public void createUserPositiveTest() {
         User user = new User("churikov1999@yandex.ru", "Agooddaytotesting", "Misha");
         steps.postCreatePositiveUser(user);
+        steps.deleteAuthUser(user);
     }
 
     @Test
     @DisplayName("Creating a user is a negative test")
     @Description("Checking the status code and response of the POST request when creating a user duplicate")
     public void createUserNegativeTest() {
-        User user = new User("churikov1999@yandex.ru", "Agooddaytotesting", "Misha");
+        User user = new User("churikov888@yandex.ru", "Agooddaytotesting", "Михаил");
         steps.postCreateNegativeUser(user);
     }
 
@@ -52,8 +53,10 @@ public class UserTest {
     @DisplayName("Authorization a user is a positive test")
     @Description("Checking the status code and response of the POST request when authorization a user")
     public void authUserTest() {
-        User user = new User("churikov999@yandex.ru", "Agooddaytotesting", "Misha");
+        User user = new User("churikov1999@yandex.ru", "Agooddaytotesting", "Misha");
+        steps.postCreatePositiveUser(user);
         steps.postAuthUser(user);
+        steps.deleteAuthUser(user);
     }
 
     @Test
@@ -70,38 +73,5 @@ public class UserTest {
     public void authUserWithoutAPasswordTest() {
         User user = new User("churikov2000@yandex.ru", "неправильный_пароль", "Misha");
         steps.postAuthWithoutPasswordUser(user);
-    }
-
-
-    @Test
-    @DisplayName("Refactor a user is a positive test")
-    @Description("Checking the status code and response of the PATCH request when refactor a user")
-    public void patchAuthUserTest() {
-        User user = new User("churikov1999@yandex.ru", "Agooddaytotesting", "Misha");
-        steps.patchAuthUser(user);
-    }
-
-    @Test
-    @DisplayName("Refactor a user with login")
-    @Description("Checking the status code and response of the PATCH request when refactor a duplicate email in user")
-    public void patchAuthUserWithoutLoginTest() {
-        User user = new User("churikov999@yandex.ru", "Agooddaytotesting", "Михаил");
-        steps.patchAuthUserWithoutLogin(user);
-    }
-
-    @Test
-    @DisplayName("Refactor a not authorization user is test")
-    @Description("Checking the status code and response of the PATCH request when refactor a not authorization user")
-    public void patchNotAuthUserTest() {
-        User user = new User("churikov999@yandex.ru", "Agooddaytotesting", "Михаил");
-        steps.patchNotAuthUser(user);
-    }
-
-    @Test
-    @DisplayName("Courier removal is a positive test")
-    @Description("Checking the status code and the response to the DELETE request")
-    public void ultimateDeleteAuthUserTest() {
-        User user = new User("churikov12345678@yandex.ru", "Agooddaytotest", "Михаил");
-        steps.deleteAuthUser(user);
     }
 }

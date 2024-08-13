@@ -10,7 +10,7 @@ import io.restassured.specification.RequestSpecification;
 import static io.restassured.RestAssured.given;
 
 public class BaseHttpClient {
-    private RequestSpecification baseRequestSpecNoAuth() {
+    private RequestSpecification baseRequestSpecNotAuth() {
         return new RequestSpecBuilder()
                 .setBaseUri(URL.HOST)
                 .addHeader("Content-type", "application/json")
@@ -41,7 +41,7 @@ public class BaseHttpClient {
 
     protected Response doGetNotAuthRequest(String path) {
         return given()
-                .spec(baseRequestSpecNoAuth())
+                .spec(baseRequestSpecNotAuth())
                 .get(path)
                 .thenReturn();
     }
@@ -49,7 +49,7 @@ public class BaseHttpClient {
 
     protected Response doNotAuthPostRequest(String path, Object body) {
         return given()
-                .spec(baseRequestSpecNoAuth())
+                .spec(baseRequestSpecNotAuth())
                 .body(body)
                 .post(path)
                 .thenReturn();
@@ -85,7 +85,7 @@ public class BaseHttpClient {
 
     protected Response doNotAuthPatchRequest(String path, Object body) {
         return given()
-                .spec(baseRequestSpecNoAuth())
+                .spec(baseRequestSpecNotAuth())
                 .header("Content-type", "application/json")
                 .body(body)
                 .patch(path)

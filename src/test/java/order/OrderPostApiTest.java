@@ -6,7 +6,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-public class OrderTest {
+public class OrderPostApiTest {
+
     private OrderSteps steps = new OrderSteps();
 
     @Test
@@ -40,19 +41,4 @@ public class OrderTest {
         Order order = new Order(Arrays.asList("g24g34g123g13g1", "1873fg3b81bf8b1d12AS"));
         steps.postAuthCreateOrderNotValidHashIngredients(order);
     }
-
-    @Test
-    @DisplayName("Get a order is a authorization with special user test")
-    @Description("Checking the status code and response of the GET request when get order is a authorization with special user")
-    public void getAuthOrderSpecialUserTest() {
-        steps.getAuthOrdersSpecialUser();
-    }
-
-    @Test
-    @DisplayName("Get a order is a not authorization with special user test")
-    @Description("Checking the status code and response of the GET request when get order is a not authorization with special user")
-    public void getNotAuthOrderSpecialUserTest() {
-        steps.getNotAuthOrdersSpecialUser();
-    }
-
 }
