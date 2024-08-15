@@ -1,30 +1,26 @@
-package user;
+package user.patch;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.ValidatableResponse;
+import org.junit.Assert;
 import org.junit.Test;
+import steps.UserSteps;
+import user.User;
 
-public class UserPatchApiTest {
+public class UserPatchApiNegativeTest {
 
     private UserSteps steps = new UserSteps();
-
-    @Test
-    @DisplayName("Refactor a user is a positive test")
-    @Description("Checking the status code and response of the PATCH request when refactor a user")
-    public void patchAuthUserTest() {
-        User user = new User("churikov1999@yandex.ru", "Agooddaytotesting", "Misha");
-        steps.postCreatePositiveUser(user);
-        steps.patchAuthUser(user);
-        User refactorUser = new User("churikov12345678@yandex.ru", "Agooddaytotest", "Михаил");
-        steps.deleteAuthUser(refactorUser);
-    }
 
     @Test
     @DisplayName("Refactor a user with login")
     @Description("Checking the status code and response of the PATCH request when refactor a duplicate email in user")
     public void patchAuthUserWithoutLoginTest() {
         User user = new User("churikov999@yandex.ru", "Agooddaytotesting", "Михаил");
-        steps.patchAuthUserWithoutLogin(user);
+        ValidatableResponse response = steps.patchAuthUserWithoutLogin(user);
+        response.assertThat().statusCode(403);
+        User patchAuthApi = response.extract().body().as(User.class);
+        Assert.assertEquals("User with such email already exists", patchAuthApi.getMessage());
     }
 
     @Test
@@ -32,6 +28,9 @@ public class UserPatchApiTest {
     @Description("Checking the status code and response of the PATCH request when refactor a not authorization user")
     public void patchNotAuthUserTest() {
         User user = new User("churikov999@yandex.ru", "Agooddaytotesting", "Михаил");
-        steps.patchNotAuthUser(user);
+        ValidatableResponse response = steps.patchNotAuthUser(user);
+        response.assertThat().statusCode(401);
+        User patchAuthApi = response.extract().body().as(User.class);
+        Assert.assertEquals("You should be authorised", patchAuthApi.getMessage());
     }
 }

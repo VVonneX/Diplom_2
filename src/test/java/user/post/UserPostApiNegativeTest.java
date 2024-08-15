@@ -1,28 +1,27 @@
-package user;
+package user.post;
 
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.ValidatableResponse;
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
+import steps.UserSteps;
+import user.User;
 
-public class UserPostApiTest {
+public class UserPostApiNegativeTest {
 
     private UserSteps steps = new UserSteps();
-
-    @Test
-    @DisplayName("Creating a user is a positive test")
-    @Description("Checking the status code and response of the POST request when creating a user")
-    public void createUserPositiveTest() {
-        User user = new User("churikov1999@yandex.ru", "Agooddaytotesting", "Misha");
-        steps.postCreatePositiveUser(user);
-        steps.deleteAuthUser(user);
-    }
 
     @Test
     @DisplayName("Creating a user is a negative test")
     @Description("Checking the status code and response of the POST request when creating a user duplicate")
     public void createUserNegativeTest() {
         User user = new User("churikov888@yandex.ru", "Agooddaytotesting", "Михаил");
-        steps.postCreateNegativeUser(user);
+        ValidatableResponse response = steps.postCreateUser(user);
+        response.assertThat().statusCode(403);
+        User createUserFromApi = response.extract().body().as(User.class);
+        Assert.assertEquals("User already exists", createUserFromApi.getMessage());
     }
 
     @Test
@@ -30,7 +29,9 @@ public class UserPostApiTest {
     @Description("Checking the status code and the response to the POST request when creating a user without a login")
     public void createUserWithoutALoginTest() {
         User user = new User("", "Agooddaytotesting", "Misha");
-        steps.postCreateWithoutLoginUser(user);
+        ValidatableResponse response = steps.postCreateUser(user);
+        User createUserFromApi = response.extract().body().as(User.class);
+        Assert.assertEquals("Email, password and name are required fields", createUserFromApi.getMessage());
     }
 
     @Test
@@ -38,7 +39,10 @@ public class UserPostApiTest {
     @Description("Checking the status code and the response to the POST request when creating a user without a password")
     public void createUserWithoutAPasswordTest() {
         User user = new User("churikov2010@yandex.ru", "", "Misha");
-        steps.postCreateWithoutPasswordUser(user);
+        ValidatableResponse response = steps.postCreateUser(user);
+        response.assertThat().statusCode(403);
+        User createUserFromApi = response.extract().body().as(User.class);
+        Assert.assertEquals("Email, password and name are required fields", createUserFromApi.getMessage());
     }
 
     @Test
@@ -46,17 +50,10 @@ public class UserPostApiTest {
     @Description("Checking the status code and the response to the POST request when creating a user without a name")
     public void createUserWithoutANameTest() {
         User user = new User("churikov2010@yandex.ru", "Agooddaytotesting", "");
-        steps.postCreateWithoutNamedUser(user);
-    }
-
-    @Test
-    @DisplayName("Authorization a user is a positive test")
-    @Description("Checking the status code and response of the POST request when authorization a user")
-    public void authUserTest() {
-        User user = new User("churikov1999@yandex.ru", "Agooddaytotesting", "Misha");
-        steps.postCreatePositiveUser(user);
-        steps.postAuthUser(user);
-        steps.deleteAuthUser(user);
+        ValidatableResponse response = steps.postCreateUser(user);
+        response.assertThat().statusCode(403);
+        User createUserFromApi = response.extract().body().as(User.class);
+        Assert.assertEquals("Email, password and name are required fields", createUserFromApi.getMessage());
     }
 
     @Test
@@ -64,7 +61,10 @@ public class UserPostApiTest {
     @Description("Checking the status code and the response to the POST request when authorization a user without a login")
     public void authUserWithoutALoginTest() {
         User user = new User("неправильный_логин", "Agooddaytotesting", "Misha");
-        steps.postAuthWithoutLoginUser(user);
+        ValidatableResponse response = steps.postAuthUser(user);
+        response.assertThat().statusCode(401);
+        User authUserFromApi = response.extract().body().as(User.class);
+        Assert.assertEquals("email or password are incorrect", authUserFromApi.getMessage());
     }
 
     @Test
@@ -72,6 +72,10 @@ public class UserPostApiTest {
     @Description("Checking the status code and the response to the POST request when authorization a user without a password")
     public void authUserWithoutAPasswordTest() {
         User user = new User("churikov2000@yandex.ru", "неправильный_пароль", "Misha");
-        steps.postAuthWithoutPasswordUser(user);
+        ValidatableResponse response = steps.postAuthUser(user);
+        response.assertThat().statusCode(401);
+        User authUserFromApi = response.extract().body().as(User.class);
+        Assert.assertEquals("email or password are incorrect", authUserFromApi.getMessage());
     }
+
 }
